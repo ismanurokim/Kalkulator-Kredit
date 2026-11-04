@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Angsuran & Profit Kredit</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Excel grid lines emulation */
+        .excel-table th, .excel-table td {
+            border: 1px solid #71717a;
+        }
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            body {
+                background: white;
+                color: black;
+            }
+            .print-shadow-none {
+                box-shadow: none !important;
+                border: 1px solid #ccc !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen py-6 px-3 sm:px-6">
+
+    <div class="max-w-5xl mx-auto space-y-6">
+
+        <!-- Header -->
+        <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-slate-800/90 border border-slate-700/80 p-5 rounded-2xl shadow-xl backdrop-blur">
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="p-2 bg-amber-500/20 text-amber-400 rounded-lg">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        </svg>
+                    </span>
+                    <h1 class="text-xl sm:text-2xl font-bold text-white">Kalkulator Angsuran & Profit</h1>
+                </div>
+                <p class="text-slate-400 text-sm mt-1">Hitung estimasi cicilan bulanan dan persentase keuntungan dengan akurat.</p>
+            </div>
+            
+            <div class="flex items-center gap-2 no-print">
+                <button onclick="resetDefaults()" class="px-3 py-2 text-xs font-medium bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg transition border border-slate-600 flex items-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    Reset Input
+                </button>
+                <button onclick="copyTableText()" class="px-3 py-2 text-xs font-medium bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition shadow-md flex items-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                    Salin Data
+                </button>
+                <button onclick="window.print()" class="px-3 py-2 text-xs font-medium bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition shadow-md flex items-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                    Cetak
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Form & Input Area -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+
+            <!-- Inputs Card (Left) -->
+            <div class="md:col-span-5 bg-slate-800/90 border border-slate-700/80 rounded-2xl p-5 shadow-xl space-y-5 no-print">
+                <h2 class="text-base font-semibold text-amber-400 flex items-center gap-2 border-b border-slate-700 pb-3">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Input Nilai Transaksi
+                </h2>
+
+                <!-- Input Harga Beli -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+                        Harga Beli (Modal Rp)
+                    </label>
+                    <div class="relative rounded-xl shadow-sm">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 font-medium">
+                            Rp
+                        </div>
+                        <input type="text" id="inputHargaBeli" value="4.000.000" oninput="handleHargaInput(this)" class="w-full pl-11 pr-4 py-3 bg-slate-900 border border-slate-600 rounded-xl text-lg font-bold text-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition">
+                    </div>
+                </div>
+
+                <!-- Input DP -->
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                            Uang Muka (DP Rp)
+                        </label>
+                        <span id="dpPercentBadge" class="text-xs px-2 py-0.5 bg-amber-500/20 text-amber-300 rounded font-medium">
+                            7.5% dari harga
+                        </span>
+                    </div>
+                    <div class="relative rounded-xl shadow-sm">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 font-medium">
+                            Rp
+                        </div>
+                        <input type="text" id="inputDP" value="300.000" oninput="handleDPInput(this)" class="w-full pl-11 pr-4 py-3 bg-slate-900 border border-slate-600 rounded-xl text-lg font-bold text-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition">
+                    </div>
+
+                    <!-- Quick DP Buttons -->
+                    <div class="flex items-center gap-1.5 mt-2.5">
+                        <span class="text-xs text-slate-400 mr-1">Quick DP:</span>
+                        <button onclick="setDPPercent(0)" class="px-2 py-1 bg-slate-700 hover:bg-slate-600 text-xs rounded text-slate-300 transition">0%</button>
+                        <button onclick="setDPPercent(5)" class="px-2 py-1 bg-slate-700 hover:bg-slate-600 text-xs rounded text-slate-300 transition">5%</button>
+                        <button onclick="setDPPercent(10)" class="px-2 py-1 bg-slate-700 hover:bg-slate-600 text-xs rounded text-slate-300 transition">10%</button>
+                        <button onclick="setDPPercent(20)" class="px-2 py-1 bg-slate-700 hover:bg-slate-600 text-xs rounded text-slate-300 transition">20%</button>
+                    </div>
+                </div>
+
+                <!-- Info Box -->
+                <div class="p-3.5 bg-slate-900/60 border border-slate-700/60 rounded-xl text-xs space-y-1.5 text-slate-300">
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">Pembiayaan (Harga Beli - DP):</span>
+                        <span id="summaryPembiayaan" class="font-semibold text-white">Rp 3.700.000</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">Rumus Angsuran:</span>
+                        <span class="font-mono text-amber-400">((Harga×(1+%Profit))-DP)/Tenor</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tenors & Profit Table Settings (Right) -->
+            <div class="md:col-span-7 bg-slate-800/90 border border-slate-700/80 rounded-2xl p-5 shadow-xl space-y-4 no-print flex flex-col justify-between">
+                <div>
+                    <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+                        <h2 class="text-base font-semibold text-amber-400 flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>
+                            Pengaturan Tenor & Profit (% Untung)
+                        </h2>
+                        <button onclick="addTenorRow()" class="px-2.5 py-1 text-xs font-semibold bg-amber-500 hover:bg-amber-400 text-slate-900 rounded-lg transition flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            Tambah Baris
+                        </button>
+                    </div>
+
+                    <!-- Config List -->
+                    <div class="mt-4 space-y-2.5 max-h-[220px] overflow-y-auto pr-1" id="configRowsContainer">
+                        <!-- Dynamic tenor config rows inserted by JS -->
+                    </div>
+                </div>
+
+                <p class="text-xs text-slate-400 italic">
+                    *Ubah nilai % untung di atas untuk memperbarui kalkulasi secara langsung pada tabel di bawah.
+                </p>
+            </div>
+
+        </div>
+
+        <!-- Section Output 1: Tampilan Tabel Excel Exact Match -->
+        <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-5 shadow-xl print-shadow-none">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 no-print">
+                <div>
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-yellow-400 inline-block"></span>
+                        Tampilan Tabel Excel (Persis Gambar)
+                    </h3>
+                    <p class="text-xs text-slate-400">Struktur kolom: NO, BANYAK ANGSURAN, % UNTUNG, HARGA BELI, DP, ANGSURAN.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="toggleTableTheme()" id="btnThemeToggle" class="px-3 py-1.5 text-xs bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg border border-slate-600 transition">
+                        Mode Tema Excel: Classic Yellow
+                    </button>
+                </div>
+            </div>
+
+            <!-- Responsive Table Container -->
+            <div class="overflow-x-auto rounded-xl border border-slate-700">
+                <table id="excelTable" class="w-full text-center border-collapse text-sm">
+                    <thead>
+                        <tr id="tableHeaderRow" class="bg-yellow-400 text-black font-bold uppercase tracking-wider border-b border-black text-xs sm:text-sm">
+                            <th class="py-2.5 px-3 border border-black w-12">NO</th>
+                            <th class="py-2.5 px-3 border border-black">BANYAK ANGSURAN</th>
+                            <th class="py-2.5 px-3 border border-black">% UNTUNG</th>
+                            <th class="py-2.5 px-3 border border-black">HARGA BELI</th>
+                            <th class="py-2.5 px-3 border border-black">DP</th>
+                            <th class="py-2.5 px-3 border border-black">ANGSURAN</th>
+                        </tr>
+                    </thead>
+                    <tbody id="excelTableBody" class="font-medium text-black bg-yellow-300">
+                        <!-- Populated dynamically by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Section Output 2: Detailed Cards View for each Tenor -->
+        <div class="space-y-3 no-print">
+            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z"></path></svg>
+                Rincian Analisis Profitabilitas Tenor
+            </h3>
+            
+            <div id="cardsContainer" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Cards inserted by JS -->
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="text-center text-xs text-slate-500 py-4 no-print border-t border-slate-800">
+            Kalkulator Angsuran & Profit Kredit &copy; 2026. Dibuat persis sesuai rumus dan tata letak spreadsheet.
+        </footer>
+
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 transform translate-y-20 opacity-0 transition-all duration-300 bg-emerald-600 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2 z-50 pointer-events-none text-sm font-medium">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        <span id="toastMsg">Berhasil!</span>
+    </div>
+
+    <script>
+        // State variables
+        let tenorData = [
+            { id: 1, tenor: 6, profit: 33 },
+            { id: 2, tenor: 9, profit: 45 },
+            { id: 3, tenor: 12, profit: 57 }
+        ];
+
+        let themeClassic = true; // default yellow Excel theme as in user image
+
+        // Initial setup on load
+        window.onload = function() {
+            renderConfigRows();
+            calculateAndRender();
+        };
+
+        // Utility: Format Number to Rupiah (e.g., 4000000 -> 4.000.000)
+        function formatNumber(num) {
+            if (isNaN(num)) return '0';
+            return Math.round(num).toLocaleString('id-ID');
+        }
+
+        // Utility: Parse Rupiah string back to raw float number
+        function parseFormattedNumber(str) {
+            if (!str) return 0;
+            const clean = str.replace(/[^0-9]/g, '');
+            return parseFloat(clean) || 0;
+        }
+
+        // Input Handlers with Realtime Currency Formatting
+        function handleHargaInput(input) {
+            let value = parseFormattedNumber(input.value);
+            input.value = formatNumber(value);
+            calculateAndRender();
+        }
+
+        function handleDPInput(input) {
+            let value = parseFormattedNumber(input.value);
+            input.value = formatNumber(value);
+            calculateAndRender();
+        }
+
+        function setDPPercent(percent) {
+            const hargaBeli = parseFormattedNumber(document.getElementById('inputHargaBeli').value);
+            const dpValue = Math.round((hargaBeli * percent) / 100);
+            document.getElementById('inputDP').value = formatNumber(dpValue);
+            calculateAndRender();
+        }
+
+        // Tenor Configuration Table
+        function renderConfigRows() {
+            const container = document.getElementById('configRowsContainer');
+            container.innerHTML = '';
+
+            tenorData.forEach((item, index) => {
+                const row = document.createElement('div');
+                row.className = 'flex items-center gap-3 bg-slate-900/80 p-2.5 rounded-xl border border-slate-700/60';
+                row.innerHTML = `
+                    <span class="text-xs font-bold text-slate-400 w-6 text-center">#${index + 1}</span>
+                    <div class="flex-1 grid grid-cols-2 gap-3">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-xs text-slate-400">Tenor:</span>
+                            <input type="number" value="${item.tenor}" min="1" max="120" onchange="updateTenor(${item.id}, 'tenor', this.value)" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-2.5 py-1 text-sm font-semibold text-white focus:outline-none focus:ring-1 focus:ring-amber-400">
+                            <span class="text-xs text-slate-400">bln</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-xs text-slate-400">Untung:</span>
+                            <input type="number" value="${item.profit}" step="0.1" min="0" onchange="updateTenor(${item.id}, 'profit', this.value)" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-2.5 py-1 text-sm font-semibold text-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400">
+                            <span class="text-xs text-slate-400">%</span>
+                        </div>
+                    </div>
+                    <button onclick="deleteTenorRow(${item.id})" class="p-1.5 text-slate-500 hover:text-rose-400 hover:bg-slate-800 rounded-lg transition" title="Hapus tenor">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </button>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function updateTenor(id, field, value) {
+            const target = tenorData.find(t => t.id === id);
+            if (target) {
+                target[field] = parseFloat(value) || 0;
+                calculateAndRender();
+            }
+        }
+
+        function addTenorRow() {
+            const nextTenor = tenorData.length > 0 ? (tenorData[tenorData.length - 1].tenor + 3) : 6;
+            const nextProfit = tenorData.length > 0 ? (tenorData[tenorData.length - 1].profit + 12) : 33;
+            const newId = Date.now();
+            tenorData.push({ id: newId, tenor: nextTenor, profit: nextProfit });
+            renderConfigRows();
+            calculateAndRender();
+            showToast('Baris tenor baru berhasil ditambahkan.');
+        }
+
+        function deleteTenorRow(id) {
+            if (tenorData.length <= 1) {
+                showToast('Minimal harus ada 1 baris tenor!');
+                return;
+            }
+            tenorData = tenorData.filter(t => t.id !== id);
+            renderConfigRows();
+            calculateAndRender();
+        }
+
+        function resetDefaults() {
+            document.getElementById('inputHargaBeli').value = '4.000.000';
+            document.getElementById('inputDP').value = '300.000';
+            tenorData = [
+                { id: 1, tenor: 6, profit: 33 },
+                { id: 2, tenor: 9, profit: 45 },
+                { id: 3, tenor: 12, profit: 57 }
+            ];
+            renderConfigRows();
+            calculateAndRender();
+            showToast('Semua nilai dikembalikan ke default.');
+        }
+
+        // Main Calculation & DOM Rendering Engine
+        function calculateAndRender() {
+            const hargaBeli = parseFormattedNumber(document.getElementById('inputHargaBeli').value);
+            const dp = parseFormattedNumber(document.getElementById('inputDP').value);
+
+            // Update DP Percentage Badge
+            const dpPercent = hargaBeli > 0 ? ((dp / hargaBeli) * 100).toFixed(1) : 0;
+            document.getElementById('dpPercentBadge').innerText = `${dpPercent}% dari harga`;
+
+            // Update Pembiayaan Summary
+            const pembiayaan = Math.max(0, hargaBeli - dp);
+            document.getElementById('summaryPembiayaan').innerText = `Rp ${formatNumber(pembiayaan)}`;
+
+            // Build Excel Table Rows
+            const tbody = document.getElementById('excelTableBody');
+            tbody.innerHTML = '';
+
+            const rowCount = tenorData.length;
+
+            tenorData.forEach((item, index) => {
+                // Calculation:
+                // Formula requested: ((Harga Beli * (1 + %Untung/100)) - DP) / Banyak Angsuran
+                const totalJual = hargaBeli * (1 + (item.profit / 100));
+                const sisaPiutang = totalJual - dp;
+                const angsuranBulan = item.tenor > 0 ? (sisaPiutang / item.tenor) : 0;
+
+                const tr = document.createElement('tr');
+                tr.className = themeClassic 
+                    ? "border-b border-black hover:bg-yellow-200 transition" 
+                    : "border-b border-slate-700 bg-slate-800/80 text-white hover:bg-slate-700/80 transition";
+
+                let htmlContent = '';
+                
+                // Column 1: NO
+                htmlContent += `<td class="py-3 px-3 border border-black font-semibold">${index + 1}</td>`;
+                
+                // Column 2: BANYAK ANGSURAN
+                htmlContent += `<td class="py-3 px-3 border border-black font-bold">${item.tenor}</td>`;
+                
+                // Column 3: % UNTUNG
+                htmlContent += `<td class="py-3 px-3 border border-black font-bold">${item.profit}</td>`;
+
+                // Column 4 & 5: HARGA BELI & DP (Merged vertically with Rowspan on first row)
+                if (index === 0) {
+                    htmlContent += `<td rowspan="${rowCount}" class="py-3 px-4 border border-black font-bold text-center align-middle ${themeClassic ? 'bg-yellow-300 text-black' : 'bg-slate-800 text-white'}">${formatNumber(hargaBeli)}</td>`;
+                    htmlContent += `<td rowspan="${rowCount}" class="py-3 px-4 border border-black font-bold text-center align-middle ${themeClassic ? 'bg-yellow-300 text-black' : 'bg-slate-800 text-white'}">${formatNumber(dp)}</td>`;
+                }
+
+                // Column 6: ANGSURAN (Calculated)
+                htmlContent += `<td class="py-3 px-4 border border-black font-extrabold text-right sm:text-center">${formatNumber(angsuranBulan)}</td>`;
+
+                tr.innerHTML = htmlContent;
+                tbody.appendChild(tr);
+            });
+
+            // Render Analytical Cards View
+            renderCards(hargaBeli, dp);
+        }
+
+        // Analytical Cards Component
+        function renderCards(hargaBeli, dp) {
+            const container = document.getElementById('cardsContainer');
+            container.innerHTML = '';
+
+            tenorData.forEach((item, index) => {
+                const totalProfitRp = hargaBeli * (item.profit / 100);
+                const totalJual = hargaBeli + totalProfitRp;
+                const sisaPiutang = totalJual - dp;
+                const angsuran = item.tenor > 0 ? (sisaPiutang / item.tenor) : 0;
+
+                const card = document.createElement('div');
+                card.className = 'bg-slate-800/90 border border-slate-700/80 rounded-2xl p-5 shadow-lg relative overflow-hidden flex flex-col justify-between group hover:border-amber-500/50 transition';
+                
+                card.innerHTML = `
+                    <div class="absolute top-0 right-0 px-3 py-1 bg-amber-500/20 text-amber-400 font-bold text-xs rounded-bl-xl border-l border-b border-amber-500/30">
+                        Tenor ${item.tenor} Bulan
+                    </div>
+
+                    <div>
+                        <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Angsuran per Bulan</div>
+                        <div class="text-2xl font-extrabold text-white mt-1 text-amber-400">
+                            Rp ${formatNumber(angsuran)}
+                        </div>
+
+                        <div class="mt-4 pt-3 border-t border-slate-700/70 space-y-2 text-xs">
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">% Keuntungan:</span>
+                                <span class="font-bold text-emerald-400">+${item.profit}%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Nominal Profit (Rp):</span>
+                                <span class="font-semibold text-slate-200">Rp ${formatNumber(totalProfitRp)}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Total Harga Jual:</span>
+                                <span class="font-semibold text-slate-200">Rp ${formatNumber(totalJual)}</span>
+                            </div>
+                            <div class="flex justify-between pt-1 border-t border-slate-700/40">
+                                <span class="text-slate-400">Sisa Angsuran (Total - DP):</span>
+                                <span class="font-bold text-white">Rp ${formatNumber(sisaPiutang)}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-2 text-[11px] text-slate-500 text-center font-mono">
+                        Cicilan: Rp ${formatNumber(angsuran)} × ${item.tenor} bln
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Toggle Theme between Excel Classic (Yellow) & Dark Modern
+        function toggleTableTheme() {
+            themeClassic = !themeClassic;
+            const header = document.getElementById('tableHeaderRow');
+            const btn = document.getElementById('btnThemeToggle');
+            const table = document.getElementById('excelTable');
+
+            if (themeClassic) {
+                header.className = "bg-yellow-400 text-black font-bold uppercase tracking-wider border-b border-black text-xs sm:text-sm";
+                btn.innerText = "Mode Tema Excel: Classic Yellow";
+                btn.className = "px-3 py-1.5 text-xs bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg border border-slate-600 transition";
+                table.className = "w-full text-center border-collapse text-sm text-black";
+            } else {
+                header.className = "bg-slate-700 text-amber-400 font-bold uppercase tracking-wider border-b border-slate-600 text-xs sm:text-sm";
+                btn.innerText = "Mode Tema Excel: Dark Modern";
+                btn.className = "px-3 py-1.5 text-xs bg-amber-500 hover:bg-amber-400 text-slate-900 font-semibold rounded-lg transition";
+                table.className = "w-full text-center border-collapse text-sm text-white";
+            }
+            calculateAndRender();
+        }
+
+        // Copy Table Content as Plain Text / Spreadsheet Friendly Format
+        function copyTableText() {
+            const hargaBeli = document.getElementById('inputHargaBeli').value;
+            const dp = document.getElementById('inputDP').value;
+
+            let text = `SIMULASI ANGSURAN & PROFIT KREDIT\n`;
+            text += `Harga Beli: Rp ${hargaBeli}\n`;
+            text += `DP: Rp ${dp}\n\n`;
+            text += `NO\tBANYAK ANGSURAN\t% UNTUNG\tHARGA BELI\tDP\tANGSURAN\n`;
+
+            tenorData.forEach((item, index) => {
+                const h = parseFormattedNumber(hargaBeli);
+                const d = parseFormattedNumber(dp);
+                const totalJual = h * (1 + (item.profit / 100));
+                const sisaPiutang = totalJual - d;
+                const angsuran = item.tenor > 0 ? (sisaPiutang / item.tenor) : 0;
+
+                text += `${index + 1}\t${item.tenor}\t${item.profit}%\t${hargaBeli}\t${dp}\t${formatNumber(angsuran)}\n`;
+            });
+
+            // Clipboard write with fallback
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast('Tabel simulasi berhasil disalin ke clipboard!');
+                }).catch(() => {
+                    fallbackCopyText(text);
+                });
+            } else {
+                fallbackCopyText(text);
+            }
+        }
+
+        function fallbackCopyText(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showToast('Tabel simulasi berhasil disalin!');
+            } catch (err) {
+                showToast('Gagal menyalin otomatis.');
+            }
+            document.body.removeChild(textArea);
+        }
+
+        // Toast Alert Helper
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            toastMsg.innerText = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
